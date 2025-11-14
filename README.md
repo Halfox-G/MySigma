@@ -29,6 +29,7 @@ cd models/encoders/selective_scan && pip install --no-build-isolation . && cd ..
 ```
 
 ### Download weights
+
 [Download link(Sigma-S-NYU)](https://drive.google.com/file/d/17afDv4BN69m66N3pfwTFnpBSXIUvlkwk/view?usp=drive_link)
 
 ## Running the code
@@ -36,4 +37,3 @@ cd models/encoders/selective_scan && pip install --no-build-isolation . && cd ..
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
-
