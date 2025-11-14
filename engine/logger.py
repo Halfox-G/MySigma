@@ -2,23 +2,22 @@ import os
 import sys
 import logging
 
-# 移除对 utils 的依赖
-# from utils import pyt_utils 
+from utils import pyt_utils
+# from utils.pyt_utils import ensure_dir
 
 _default_level_name = os.getenv('ENGINE_LOGGING_LEVEL', 'INFO')
-_default_level = logging.getLevelName(_default_level_name.upper())
 
-
-# ----------------------------------------------------------------------
-# 集成的辅助函数：确保目录存在
-# ----------------------------------------------------------------------
-def ensure_dir(path):
-    """
-    检查目录是否存在，如果不存在则创建。
-    这个函数取代了 pyt_utils.ensure_dir，使 logger.py 不再有外部依赖。
-    """
-    if not os.path.exists(path):
-        os.makedirs(path)
+# logging.getLevelName returns an int for known level names (e.g. 'INFO' -> 20),
+# otherwise it returns the input string. Handle numeric strings too and fall
+# back to INFO if the value is invalid.
+if isinstance(_tmp_level, int):
+    _default_level = _tmp_level
+else:
+    try:
+        # allow numeric levels specified as strings, e.g. '10'
+        _default_level = int(_default_level_name)
+    except Exception:
+        _default_level = logging.INFO
 
 
 class LogFormatter(logging.Formatter):
@@ -43,7 +42,9 @@ class LogFormatter(logging.Formatter):
         if self.log_fout:
             self.__set_fmt(self.date_full + mtxt + self.msg)
             formatted = super(LogFormatter, self).format(record)
-            # 文件输出部分被注释掉，但格式化逻辑保留
+            # self.log_fout.write(formatted)
+            # self.log_fout.write('\n')
+            # self.log_fout.flush()
             return formatted
 
         self.__set_fmt(self._color_date(self.date) + mcl(mtxt + self.msg))
@@ -86,16 +87,15 @@ class LogFormatter(logging.Formatter):
 def get_logger(log_dir=None, log_file=None, formatter=LogFormatter):
     logger = logging.getLogger()
     logger.setLevel(_default_level)
-    # 清除旧的 handlers，避免重复输出
-    del logger.handlers[:] 
+    del logger.handlers[:]
 
     if log_dir and log_file:
-        # 使用集成的 ensure_dir 函数
-        ensure_dir(log_dir) 
+        pyt_utils.ensure_dir(log_dir)
         LogFormatter.log_fout = True
         file_handler = logging.FileHandler(log_file, mode='a')
         file_handler.setLevel(logging.INFO)
-        file_handler.setFormatter(formatter)
+        # formatter is passed as a class (default LogFormatter) — instantiate it
+        file_handler.setFormatter(formatter())
         logger.addHandler(file_handler)
 
     stream_handler = logging.StreamHandler()
