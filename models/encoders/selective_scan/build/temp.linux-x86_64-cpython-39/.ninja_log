@@ -1,0 +1,6 @@
+# ninja log v5
+4	13345	1746942326657177752	/output/Sigma/models/encoders/selective_scan/build/temp.linux-x86_64-cpython-39/csrc/selective_scan/selective_scan_core_fwd2.o	2cf672fefcfe5f63
+4	17199	1746942330509218920	/output/Sigma/models/encoders/selective_scan/build/temp.linux-x86_64-cpython-39/csrc/selective_scan/selective_scan_core_fwd3.o	9f2eb37d776118b5
+5	21840	1746942335153268553	/output/Sigma/models/encoders/selective_scan/build/temp.linux-x86_64-cpython-39/csrc/selective_scan/selective_scan_core_fwd4.o	c504c9abce098305
+3	29528	1746942342841350718	/output/Sigma/models/encoders/selective_scan/build/temp.linux-x86_64-cpython-39/csrc/selective_scan/selective_scan.o	a3c8bdd465f9ecf
+3	31567	1746942344869372392	/output/Sigma/models/encoders/selective_scan/build/temp.linux-x86_64-cpython-39/csrc/selective_scan/selective_scan_core.o	74645dd408a106b

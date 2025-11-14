@@ -1,0 +1,33 @@
+# PyTorch 与深度学习相关
+torch
+torchvision
+torchaudio
+timm>=0.4.12
+einops
+fvcore
+transformers
+tensorboardX>=2.2
+
+# 数值计算与科学计算
+numpy
+scipy>=1.7.0
+
+# 图像处理
+Pillow
+opencv-python>=4.5.0
+
+# 工具库
+easydict>=1.9
+packaging
+tqdm>=4.40.0
+pytest
+chardet
+yacs
+termcolor
+submitit
+seaborn
+
+# Web 服务与异步IO
+fastapi
+uvicorn
+python-multipart

@@ -1,0 +1,18 @@
+# 忽略 Python 缓存
+__pycache__/
+*.pyc
+
+# 忽略虚拟环境
+venv/
+
+# 忽略模型权重、临时数据等大文件
+*.pth
+*.ckpt
+*.npz
+
+# 忽略 IDE 自动生成的东西
+.vscode/
+.idea/
+
+# 忽略系统文件
+.DS_Store
