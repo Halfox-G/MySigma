@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -297,8 +298,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .error {
@@ -469,16 +475,16 @@
             .container {
                 flex-direction: column;
             }
-            
+
             .header h1 {
                 font-size: 2rem;
             }
-            
+
             .api-links {
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .mode-options {
                 flex-direction: column;
                 align-items: flex-start;
@@ -486,7 +492,9 @@
         }
     </style>
 </head>
+
 <body>
+    <!-- 页面头部 -->
     <div class="header">
         <h1><i class="fas fa-project-diagram"></i> 多模态语义分割工具</h1>
         <p>
@@ -505,13 +513,16 @@
         </div>
     </div>
 
+    <!-- 核心容器 -->
     <div class="container">
+        <!-- 上传区域 -->
         <div class="panel">
             <div class="panel-header">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <h2>图像上传与设置</h2>
             </div>
             <div class="panel-body">
+                <!-- 深度图模式选择 -->
                 <div class="mode-select-group">
                     <label class="mode-select-label">深度图获取方式</label>
                     <div class="mode-options">
@@ -526,6 +537,7 @@
                     </div>
                 </div>
 
+                <!-- RGB图像上传（必选项） -->
                 <div class="upload-group">
                     <label class="upload-label">RGB彩色图像（必选）</label>
                     <div class="upload-area" id="rgb-upload-area">
@@ -538,6 +550,7 @@
                     </div>
                 </div>
 
+                <!-- 深度图上传区域（手动模式下显示） -->
                 <div class="depth-upload-wrapper" id="depth-upload-wrapper">
                     <div class="upload-group">
                         <label class="upload-label">深度图（必选）</label>
@@ -552,10 +565,12 @@
                     </div>
                 </div>
 
+                <!-- 开始分割按钮 -->
                 <button id="start-segment" class="btn btn-primary" disabled>
                     <i class="fas fa-play-circle"></i> 开始语义分割
                 </button>
 
+                <!-- 上传预览 -->
                 <div class="preview-group">
                     <div class="preview-title">
                         <i class="fas fa-image"></i> RGB图像预览
@@ -566,6 +581,7 @@
                     </div>
                 </div>
 
+                <!-- 深度图预览（手动模式下显示） -->
                 <div class="depth-upload-wrapper" id="depth-preview-wrapper">
                     <div class="preview-group">
                         <div class="preview-title">
@@ -580,12 +596,14 @@
             </div>
         </div>
 
+        <!-- 结果区域 -->
         <div class="panel">
             <div class="panel-header">
                 <i class="fas fa-chart-bar"></i>
                 <h2>分割结果</h2>
             </div>
             <div class="panel-body">
+                <!-- 结果预览 -->
                 <div class="preview-group">
                     <div class="preview-title">
                         <i class="fas fa-mask"></i> 分割掩码图
@@ -596,14 +614,17 @@
                     </div>
                 </div>
 
+                <!-- 加载状态 -->
                 <div class="loading" id="result-loading" style="display: none;">
                     <div class="spinner"></div>
                     <p>正在处理图像并执行语义分割...</p>
                     <p class="text-muted">此过程可能需要10-30秒，请耐心等待</p>
                 </div>
 
+                <!-- 错误提示 -->
                 <div class="error" id="result-error"></div>
 
+                <!-- 结果信息 -->
                 <div class="result-container" id="result-info">
                     <div class="info-grid">
                         <div class="info-card">
@@ -633,7 +654,8 @@
                         <i class="fas fa-list"></i> 类别详情
                     </div>
                     <div class="class-details" id="class-details-container">
-                        </div>
+                        <!-- 类别详情将通过JS动态生成 -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -681,7 +703,7 @@
                 modeOptions.forEach(opt => opt.classList.remove("active"));
                 option.classList.add("active");
                 currentMode = option.dataset.mode;
-                
+
                 // 显示/隐藏深度图上传区域
                 if (currentMode === "manual") {
                     depthUploadWrapper.classList.add("show");
@@ -690,7 +712,7 @@
                     depthUploadWrapper.classList.remove("show");
                     depthPreviewWrapper.classList.remove("show");
                 }
-                
+
                 // 重新检查按钮状态
                 checkButtonState();
             });
@@ -708,7 +730,7 @@
 
         // 4. 拖放功能 - RGB区域
         setupDragDrop(rgbUploadArea, "rgb");
-        
+
         // 5. 拖放功能 - 深度图区域
         setupDragDrop(depthUploadArea, "depth");
 
@@ -717,28 +739,26 @@
             // 重置之前的结果
             resetResults();
             resultLoading.style.display = "block";
-            
+
             try {
                 const formData = new FormData();
                 formData.append("rgb_image", uploadedRgbFile);
-                
+
                 let url = "http://localhost:8000/segment";
-                
+
                 // 根据模式选择不同的API端点
                 if (currentMode === "manual") {
                     url = "http://localhost:8000/segment_with_depth";
                     formData.append("depth_image", uploadedDepthFile);
                 } else {
-                    // 【简化】移除 use_estimated_depth=true 的字段，
-                    // 因为 /segment 接口现在默认就是自动生成深度图
-                    // formData.append("use_estimated_depth", "true"); 
+                    formData.append("use_estimated_depth", "true");
                 }
 
                 // 发送请求
                 const response = await fetch(url, {
                     method: "POST",
                     body: formData,
-                    // timeout: 60000 // JS fetch API不支持timeout，请在服务器或代理中设置
+                    timeout: 60000 // 60秒超时
                 });
 
                 const result = await response.json();
@@ -747,7 +767,7 @@
 
                 // 处理成功结果
                 processSuccessResponse(result);
-                
+
             } catch (err) {
                 // 处理错误结果
                 resultLoading.style.display = "none";
@@ -776,7 +796,7 @@
                 uploadedDepthFile = file;
                 updatePreview(file, depthPreview, depthNoPreview, depthUploadArea);
             }
-            
+
             // 检查按钮状态
             checkButtonState();
         }
@@ -795,12 +815,12 @@
             element.addEventListener("drop", (e) => {
                 e.preventDefault();
                 element.classList.remove("active");
-                
+
                 const file = e.dataTransfer.files[0];
                 if (file && file.type.match('image.*')) {
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
-                    
+
                     if (type === "rgb") {
                         rgbUpload.files = dataTransfer.files;
                         rgbUpload.dispatchEvent(new Event('change', { bubbles: true }));
@@ -815,14 +835,14 @@
         // 更新预览图像
         function updatePreview(file, previewImg, noPreviewEl, uploadArea) {
             const reader = new FileReader();
-            
+
             reader.onload = (event) => {
                 previewImg.src = event.target.result;
                 previewImg.style.display = "block";
                 noPreviewEl.style.display = "none";
                 uploadArea.classList.add("active");
             };
-            
+
             reader.readAsDataURL(file);
         }
 
@@ -842,48 +862,59 @@
             resultLoading.style.display = "none";
             resultInfo.style.display = "block";
             resultMask.style.display = "block";
-            resultNoPreview.style.display = "none"; // 隐藏未预览文字
             resultMask.src = `data:image/png;base64,${response.segmentation_map}`;
-            
+
             // 更新深度图来源信息
-            depthSource.textContent = response.depth_source === "manual" 
-                ? "用户手动上传深度图" 
+            depthSource.textContent = response.depth_source === "manual"
+                ? "用户手动上传深度图"
                 : "系统自动生成深度图";
-            
+
             // 填充基础结果信息
             processTime.textContent = `${response.processing_time} 秒`;
             avgConfidence.textContent = response.average_confidence.toFixed(3);
             detectClasses.textContent = response.detected_classes.length;
-            
+
             // 主要物体
-            if (response.main_objects && response.main_objects.length) {
-              mainObjects.textContent = response.main_objects.join("、");
-            } else if (response.class_details && response.class_details.length) {
-              const topClasses = [...response.class_details]
+            if (response.class_details && response.class_details.length) {
+                const topClasses = [...response.class_details]
                     .sort((a, b) => parseFloat(b.percentage) - parseFloat(a.percentage))
                     .slice(0, 3)
                     .map(item => item.class_name);
-              mainObjects.textContent = topClasses.join("、");
+                mainObjects.textContent = topClasses.join("、");
+            } else if (response.main_objects && response.main_objects.length) {
+                mainObjects.textContent = response.main_objects.join("、");
             } else {
-              mainObjects.textContent = "无主要物体";
+                mainObjects.textContent = "无主要物体";
             }
-            
+
             // 类别详情
             if (response.class_details && response.class_details.length) {
                 classDetailsContainer.innerHTML = "";
-                // 【核心修改】使用后端返回的 classItem.color 属性
-                response.class_details.forEach((classItem) => {
+                response.class_details.forEach((classItem, index) => {
+                    // 优先使用后端返回的颜色（hex），如果没有则使用 color_rgb，再回退到生成的颜色
+                    let hexColor = null;
+                    if (classItem.color) {
+                        hexColor = classItem.color;
+                    } else if (classItem.color_rgb && Array.isArray(classItem.color_rgb)) {
+                        const [r, g, b] = classItem.color_rgb;
+                        hexColor = `#${(r).toString(16).padStart(2, '0')}${(g).toString(16).padStart(2, '0')}${(b).toString(16).padStart(2, '0')}`;
+                    } else {
+                        // 退回到生成颜色（保证稳定性）
+                        const fallback = generateColors(response.class_details.length)[index];
+                        hexColor = fallback;
+                    }
+
                     const classEl = document.createElement("div");
                     classEl.className = "class-item";
                     classEl.innerHTML = `
                         <div class="class-name">
-                            <span class="class-color" style="background: ${classItem.color}"></span>
+                            <span class="class-color" style="background: ${hexColor}"></span>
                             ${classItem.class_name}（ID:${classItem.class_id}）
                         </div>
                         <div>
                             <div class="class-percentage">${classItem.percentage}%</div>
                             <div class="progress-bar">
-                                <div class="progress-value" style="width: ${classItem.percentage}%"></div>
+                                <div class="progress-value" style="width: ${classItem.percentage}%; background: ${hexColor}"></div>
                             </div>
                         </div>
                     `;
@@ -894,12 +925,22 @@
             }
         }
 
+        // 生成随机颜色数组
+        function generateColors(count) {
+            const colors = [];
+            for (let i = 0; i < count; i++) {
+                // 使用HSV色彩空间生成均匀分布的颜色
+                const hue = (i * 360 / count) % 360;
+                colors.push(`hsl(${hue}, 70%, 50%)`);
+            }
+            return colors;
+        }
+
         // 重置结果显示
         function resetResults() {
             resultError.style.display = "none";
             resultInfo.style.display = "none";
             resultMask.style.display = "none";
-            resultNoPreview.style.display = "block"; // 重新显示未预览文字
             classDetailsContainer.innerHTML = "";
         }
 
@@ -914,4 +955,5 @@
         }
     </script>
 </body>
+
 </html>
