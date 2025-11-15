@@ -37,3 +37,8 @@ cd models/encoders/selective_scan && pip install --no-build-isolation . && cd ..
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
+or
+
+```bash
+python main.py
+``` 
