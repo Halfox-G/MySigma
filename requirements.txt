@@ -1,22 +1,18 @@
-# PyTorch 与深度学习相关
-torch
-torchvision
-torchaudio
-timm>=0.4.12
+# 图像模型工具
+timm==0.4.12
 einops
 fvcore
 transformers
-tensorboardX>=2.2
 
-# 数值计算与科学计算
-numpy
+# 科学计算
+numpy==1.26.4
 scipy>=1.7.0
 
 # 图像处理
 Pillow
 opencv-python>=4.5.0
 
-# 工具库
+# 实用工具
 easydict>=1.9
 packaging
 tqdm>=4.40.0
@@ -27,7 +23,10 @@ termcolor
 submitit
 seaborn
 
-# Web 服务与异步IO
+# Web 服务
 fastapi
 uvicorn
 python-multipart
+
+# 日志
+tensorboardX>=2.2
