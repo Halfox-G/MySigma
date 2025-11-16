@@ -24,6 +24,8 @@ model = None
 device = None
 depth_estimator = None
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # 类别名称映射 - 使用NYU数据集的40个类别
 CLASS_NAMES = {
     0: "墙壁",
@@ -185,7 +187,7 @@ def load_segmentation_model():
 
         print("模型结构构建成功")
 
-        model_path = "nyudepthv2-sigma-small-epoch-390.pth"
+        model_path = os.path.join(BASE_DIR, "checkpoints/nyudepthv2-sigma-small-epoch-390.pth")
         print(f"尝试从 {model_path} 加载权重...")
 
         try:

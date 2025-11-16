@@ -4,7 +4,6 @@ import sys
 import time
 import numpy as np
 from easydict import EasyDict as edict
-import argparse
 
 C = edict()
 config = C
@@ -13,8 +12,8 @@ cfg = C
 C.seed = 3407
 
 remoteip = os.popen('pwd').read()
-C.root_dir = os.getenv("OPENBAYES_WORKSPACE", "/openbayes/home/Sigma")
-C.abs_dir = C.root_dir
+C.root_dir = os.path.abspath(os.path.join(os.getcwd(), './'))
+C.abs_dir = osp.realpath(".")
 
 # Dataset config
 """Dataset Path"""
@@ -30,10 +29,10 @@ C.gt_transform = True
 C.x_root_folder = osp.join(C.dataset_path, 'Depth')
 C.x_format = '.png'
 C.x_is_single_channel = True # True for raw depth, thermal and aolp/dolp(not aolp/dolp tri) input
-C.train_source = osp.join(C.dataset_path, "train2.txt")
+# training sources removed; keep eval source for inference/evaluation lists
 C.eval_source = osp.join(C.dataset_path, "test2.txt")
-C.is_test = False
-C.num_train_imgs = 795
+# Use this config primarily for inference. Set to True to indicate test/inference mode.
+C.is_test = True
 C.num_eval_imgs = 654
 C.num_classes = 40
 C.class_names = [
@@ -91,20 +90,18 @@ C.backbone = 'sigma_small' # sigma_tiny / sigma_small / sigma_base
 C.pretrained_model = None # do not need to change
 C.decoder = 'MambaDecoder' # 'MLPDecoder'
 C.decoder_embed_dim = 512
-C.optimizer = 'AdamW'
 
-"""Train Config"""
-C.lr = 6e-5
-C.lr_power = 0.9
-C.momentum = 0.9
-C.weight_decay = 0.01
-C.batch_size = 8
-C.nepochs = 500
-C.niters_per_epoch = C.num_train_imgs // C.batch_size  + 1
-C.num_workers = 16
-C.train_scale_array = [0.5, 0.75, 1, 1.25, 1.5, 1.75]
-C.warm_up_epoch = 10
+"""Inference / General Config"""
+# Turn on test/inference mode and set light-weight dataloader workers for inference.
+C.is_test = True
+C.inference_batch_size = 1
+C.device = 'cuda'  # or 'cpu'
+C.model_checkpoint = None  # Path to trained model; set this before running inference
+# Keep a reasonable number of workers for data loading during inference
+C.num_workers = 4
 
+# Batch-norm and related flags are kept for compatibility with model loading but are
+# not used for training here.
 C.fix_bias = True
 C.bn_eps = 1e-3
 C.bn_momentum = 0.1
@@ -117,8 +114,8 @@ C.eval_flip = True
 C.eval_crop_size = [480, 640] # [height weight]
 
 """Store Config"""
-C.checkpoint_start_epoch = 50
-C.checkpoint_step = 15##changed
+# Checkpoint directory is still useful for loading saved models at inference time.
+# Training-specific checkpoint scheduling fields removed.
 
 """Path Config"""
 def add_path(path):
@@ -139,11 +136,10 @@ C.val_log_file = C.log_dir + '/val_' + exp_time + '.log'
 C.link_val_log_file = C.log_dir + '/val_last.log'
 
 if __name__ == '__main__':
-    print(config.nepochs)
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        '-tb', '--tensorboard', default=False, action='store_true')
-    args = parser.parse_args()
-
-    if args.tensorboard:
-        open_tensorboard()
+    # Simple summary for inference usage
+    print("Inference config summary:")
+    print(f"  dataset: {C.dataset_name}")
+    print(f"  is_test: {C.is_test}")
+    print(f"  eval list: {C.eval_source}")
+    print(f"  checkpoint_dir: {C.checkpoint_dir}")
+    print(f"  model_checkpoint: {C.model_checkpoint}")
