@@ -365,7 +365,7 @@ def create_segmentation_mask(mask):
 
 
 def analyze_segmentation_results(mask, confidence, processing_time):
-    """分析分割结果并返回统计信息"""
+    """分析分割结果并返回统计信息（过滤掉占比小于0.5%的类别）"""
     unique_labels, counts = np.unique(mask, return_counts=True)
 
     # 添加详细的调试信息
@@ -375,7 +375,7 @@ def analyze_segmentation_results(mask, confidence, processing_time):
     print(f"mask总像素数: {mask.size}")
     print(f"mask形状: {mask.shape}")
 
-    # 构建详细的类别信息 - 严格过滤掉占比为0%的类别
+    # 构建详细的类别信息 - 严格过滤掉占比小于0.5%的类别
     class_details = []
     main_objects = []
     filtered_detected_classes = []
@@ -387,8 +387,8 @@ def analyze_segmentation_results(mask, confidence, processing_time):
         # 详细的调试信息
         print(f"类别 {class_id} ({CLASS_NAMES.get(class_id, '未知')}): count={count}, percentage={percentage:.10f}%")
 
-        # 严格过滤：只保留占比大于0.001%的类别，避免浮点数精度问题
-        if percentage > 0.001:
+        # 严格过滤：只保留占比大于0.5%的类别
+        if percentage > 0.5:
             rounded_percentage = round(percentage, 2)
             class_name = CLASS_NAMES.get(class_id, f"未知类别{class_id}")
             # 获取颜色并格式化为十六进制字符串和 RGB 列表
