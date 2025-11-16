@@ -32,13 +32,27 @@ cd models/encoders/selective_scan && pip install --no-build-isolation . && cd ..
 
 [Download link(Sigma-S-NYU)](https://drive.google.com/file/d/17afDv4BN69m66N3pfwTFnpBSXIUvlkwk/view?usp=drive_link)
 
+## Structure
+
+Place the downloaded weights in the `checkpoints` folder:
+
+```MySigma/
+├── checkpoints/
+│   └── nyudepthv2-sigma-small-epoch-390.pth
+├── main.py
+├── models/
+├── utils/
+├── engine/
+├── configs/
+├── requirements.txt
+├── index.html
+└── README.md
+```
+
 ## Running the code
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
-or
 
-```bash
-python main.py
-``` 
+Then open your browser and navigate to `http://localhost:8000` to access the web interface.
