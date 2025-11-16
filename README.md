@@ -56,4 +56,10 @@ MySigma/
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
+or
+
+```bash
+python main.py
+```
+
 Then open your browser and navigate to `http://localhost:8000` to access the web interface.
