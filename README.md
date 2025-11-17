@@ -36,7 +36,31 @@ cd models/encoders/selective_scan && pip install --no-build-isolation . && cd ..
 
 Place the downloaded weights in the `checkpoints` folder:
 
-![Directory Structure](./fig/directory_structure.png)
+```
+.
+├── checkpoints
+│   └── nyudepthv2-sigma-small-epoch-390.pth
+├── configs
+│   └── config_nyu.py
+├── engine
+│   ├── __init__.py
+│   └── logger.py
+├── index.html
+├── main.py
+├── models
+│   ├── __init__.py
+│   ├── builder.py
+│   ├── decoders
+│   ├── encoders
+│   └── net_utils.py
+├── README.md
+├── requirements.txt
+└── utils
+    ├── __init__.py
+    ├── init_func.py
+    ├── load_utils.py
+    └── pyt_utils.py
+```
 
 ## Running the code
 
