@@ -33,7 +33,7 @@ if True:
     
     class SelectiveScan(torch.autograd.Function):
         @staticmethod
-        @torch.cuda.amp.custom_fwd(cast_inputs=torch.float32)
+        @torch.amp.custom_fwd(cast_inputs=torch.float32, device_type='cuda')
         def forward(ctx, u, delta, A, B, C, D=None, delta_bias=None, delta_softplus=False, nrows=1):
             assert nrows in [1, 2, 3, 4], f"{nrows}" # 8+ is too slow to compile
             assert u.shape[1] % (B.shape[1] * nrows) == 0, f"{nrows}, {u.shape}, {B.shape}"
@@ -64,7 +64,7 @@ if True:
             return out
 
         @staticmethod
-        @torch.cuda.amp.custom_bwd
+        @torch.amp.custom_fwd(cast_inputs=torch.float32, device_type='cuda')
         def backward(ctx, dout, *args):
             u, delta, A, B, C, D, delta_bias, x = ctx.saved_tensors
             if dout.stride(-1) != 1:
@@ -2188,7 +2188,7 @@ class Backbone_VSSM(VSSM):
             incompatibleKeys = self.load_state_dict(_ckpt[key], strict=False)
             print('incompatible:', incompatibleKeys)        
         except Exception as e:
-            print(f"Failed loading checkpoint form {ckpt}: {e}")
+            return
 
     def forward(self, x):
         def layer_forward(l, x):

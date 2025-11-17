@@ -129,32 +129,52 @@ app.add_middleware(
 
 
 def load_depth_estimation_model():
-    """加载深度估计模型 - 两级策略"""
-    try:
-        # 第一级：尝试离线模式
-        print("第一级：尝试离线模式加载...")
-        os.environ['TRANSFORMERS_OFFLINE'] = '1'
-        os.environ['HF_DATASETS_OFFLINE'] = '1'
+    """
+    加载深度估计模型，支持固定缓存路径，避免重复下载
+    """
+    global BASE_DIR
 
+    # 固定缓存路径（可根据你的服务器环境修改）
+    cache_dir = os.path.join(BASE_DIR, "huggingface_cache")
+    os.makedirs(cache_dir, exist_ok=True)
+
+    # 先尝试离线加载
+    os.environ['TRANSFORMERS_OFFLINE'] = '1'
+    os.environ['HF_DATASETS_OFFLINE'] = '1'
+    os.environ['TRANSFORMERS_CACHE'] = cache_dir
+
+    try:
+        print(f"尝试从本地缓存加载深度估计模型（{cache_dir}）...")
         from transformers import pipeline
-        depth_pipeline = pipeline("depth-estimation", model="Intel/dpt-hybrid-midas")
-        print("✅ 离线模式加载成功")
+        depth_pipeline = pipeline(
+            "depth-estimation",
+            model="Intel/dpt-hybrid-midas",
+            feature_extractor="Intel/dpt-hybrid-midas",
+            cache_dir=cache_dir
+        )
+        print("✅ 本地缓存加载成功")
         return depth_pipeline
 
     except Exception as e:
-        print(f"离线模式失败: {e}")
+        print(f"本地缓存加载失败: {e}")
+        print("尝试在线下载并缓存...")
+
+        # 切换在线模式
+        os.environ['TRANSFORMERS_OFFLINE'] = '0'
+        os.environ['HF_DATASETS_OFFLINE'] = '0'
 
         try:
-            # 第二级：从网络下载
-            print("第二级：尝试从网络下载...")
-            os.environ['TRANSFORMERS_OFFLINE'] = '0'  # 重置为在线模式
             from transformers import pipeline
-            depth_pipeline = pipeline("depth-estimation", model="Intel/dpt-hybrid-midas")
-            print("✅ 网络下载成功")
+            depth_pipeline = pipeline(
+                "depth-estimation",
+                model="Intel/dpt-hybrid-midas",
+                feature_extractor="Intel/dpt-hybrid-midas",
+                cache_dir=cache_dir
+            )
+            print(f"✅ 在线下载成功，已缓存到 {cache_dir}")
             return depth_pipeline
-
         except Exception as e2:
-            print(f"❌ 所有加载方法都失败: {e2}")
+            print(f"❌ 模型加载失败: {e2}")
             return None
 
 
