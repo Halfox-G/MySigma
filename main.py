@@ -95,7 +95,7 @@ CLASS_COLORS = _generate_pascal_colormap(256)[0:NUM_CLASSES]
 async def lifespan(app: FastAPI):
     """生命周期管理 - 替代过时的 on_event"""
     # 启动时执行
-    print("🚀 多模态语义分割服务启动中...")
+    print("🚀 学生社区家具资产动态感知与配置优化系统启动中...")
     print(f"📊 类别数量: {len(CLASS_NAMES)}")
     print(f"📋 类别映射: {CLASS_NAMES}")
     success = load_segmentation_model()
@@ -113,7 +113,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="多模态语义分割API",
+    title="学生社区家具资产感知配置API",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -246,7 +246,7 @@ def load_segmentation_model():
         else:
             print("⚠️  深度估计模型加载失败，将使用备用方案")
 
-        print("✅ NYU多模态分割模型加载完成!")
+        print("✅ 多模态分割模型加载完成!")
         return True
 
     except Exception as e:
@@ -461,7 +461,7 @@ async def segment_multimodal(
         use_estimated_depth: bool = Form(True, description="是否使用估计的深度图")
 ):
     """
-    多模态语义分割接口（自动生成深度图）
+    家具资产感知分割接口（自动生成深度图）
     - rgb_image: RGB彩色图像
     - use_estimated_depth: 是否使用估计的深度图（True:自动生成, False:需要上传深度图）
     """
@@ -549,13 +549,13 @@ async def segment_multimodal(
             "main_objects": analysis_results["main_objects"],
             "class_names_mapping": CLASS_NAMES,
             "average_confidence": analysis_results["average_confidence"],
-            "message": f"多模态分割完成，检测到 {len(analysis_results['main_objects'])} 个主要物体" if analysis_results[
+            "message": f"分割完成，检测到 {len(analysis_results['main_objects'])} 个主要物体" if analysis_results[
                 'main_objects'] else "主要检测到未标记区域",
             "note": "已过滤占比小于0.01%的类别"
         }
 
     except Exception as e:
-        error_msg = f"多模态分割失败: {str(e)}"
+        error_msg = f"分割失败: {str(e)}"
         print(error_msg)
         traceback.print_exc()
 
@@ -575,7 +575,7 @@ async def segment_with_depth(
         depth_image: UploadFile = File(..., description="深度图图像")
 ):
     """
-    多模态语义分割接口（手动输入深度图）
+    家具资产感知分割接口（手动输入深度图）
     - rgb_image: RGB彩色图像
     - depth_image: 深度图图像
     """
@@ -659,13 +659,13 @@ async def segment_with_depth(
             "main_objects": analysis_results["main_objects"],
             "class_names_mapping": CLASS_NAMES,
             "average_confidence": analysis_results["average_confidence"],
-            "message": f"多模态分割完成，检测到 {len(analysis_results['main_objects'])} 个主要物体" if analysis_results[
+            "message": f"分割完成，检测到 {len(analysis_results['main_objects'])} 个主要物体" if analysis_results[
                 'main_objects'] else "主要检测到未标记区域",
             "note": "已过滤占比小于0.01%的类别，使用手动输入的深度图"
         }
 
     except Exception as e:
-        error_msg = f"多模态分割失败: {str(e)}"
+        error_msg = f"分割失败: {str(e)}"
         print(error_msg)
         traceback.print_exc()
 
@@ -692,7 +692,7 @@ async def root():
             return JSONResponse(
                 status_code=200,
                 content={
-                    "message": "多模态语义分割API服务运行中（自动深度估计 + 手动深度图输入）",
+                    "message": "学生社区家具资产动态感知与配置优化服务运行中（自动深度估计 + 手动深度图输入）",
                     "model_loaded": model is not None,
                     "depth_estimator_loaded": depth_estimator is not None,
                     "device": str(device) if device else "unknown",
